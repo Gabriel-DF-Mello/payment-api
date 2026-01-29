@@ -63,7 +63,6 @@ export class CreatePreferenceDto {
       registration_date: "2024-04-01T00:00:00Z"
     }
     this.notification_url = `${process.env.WEBHOOK_URL}`
-    this.auto_return = 'approved'
     this.expires = false
     this.external_reference = id.toString()
   }

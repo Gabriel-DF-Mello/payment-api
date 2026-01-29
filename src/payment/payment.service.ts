@@ -15,7 +15,7 @@ export class PaymentService {
       dto,
     })
 
-     const payment = await this.prisma.$transaction(async (transaction) => {
+     const [payment, preference] = await this.prisma.$transaction(async (transaction) => {
       let pending = await transaction.payment.create({
         data: {
           cpf: dto.cpf,
@@ -27,9 +27,15 @@ export class PaymentService {
       })
 
       if(dto.paymentMethod == Constants.CREDIT_CARD){
-        const preference = await this.mercadoPago.createPreference(pending.id, pending.cpf, pending.amount.toNumber())
+        try{
+          const preference = await this.mercadoPago.createPreference(pending.id, pending.cpf, pending.amount.toNumber())
+          console.log({preference})
 
-        if (preference.status == HttpStatus.BAD_REQUEST || preference.status == HttpStatus.INTERNAL_SERVER_ERROR){
+          return [pending, preference]
+
+        } catch (error){
+          console.log(error)
+
           pending = await transaction.payment.update({
             data: {
               status: Constants.FAIL
@@ -38,16 +44,18 @@ export class PaymentService {
               id: pending.id
             }
           })
+
+          return [pending, null]
         }
       }
 
-      return pending
+      return [pending, null]
     })
     if(payment.status == Constants.FAIL) {
       throw new HttpException('Payment Failed', HttpStatus.BAD_REQUEST)
     }
 
-    return payment
+    return {payment, preference}
   }
 
   async updatePayment(id: number, dto: UpdatePaymentDto){
