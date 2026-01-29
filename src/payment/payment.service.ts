@@ -1,6 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Payment } from '@prisma/client'
-import { CreatePaymentDto, FindPaymentsDto, UpdatePaymentDto } from './dto';
+import { CreatePaymentDto, FindPaymentsDto, NotifyPaymentDto, UpdatePaymentDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Constants } from 'src/constants';
 import { MercadoPagoService } from 'src/mercado-pago/mercado-pago.service';
@@ -102,5 +102,46 @@ export class PaymentService {
 
   async notifyPayment(dto: any){
     console.log(dto)
+
+    let status = Constants.PENDING
+    //Receive a payment action, get data id
+    if(dto.type != Constants.MP_TYPE_PAYMENT){
+      return true
+    }
+
+    try {
+      // Get payment via id from mercado-pago API
+      let payment = await this.mercadoPago.getPayment(dto.data.id)
+      console.log(payment)
+
+      if(!payment.data.external_reference){
+        throw new NotFoundException('Payment missing external reference');
+      }
+
+      // if payment status is approved, update to PAID
+      if(payment.data.status in Constants.MP_STATUS_PAID){
+        status = Constants.PAID
+      // if payment is pending, authorized, in_process or in_mediation, update to PENDING
+      } else if (payment.data.status in Constants.MP_STATUS_PENDING){
+        status = Constants.PENDING
+      // if payment is rejected, cancelled, refunded or charged_back, update to FAIL
+      } else {
+        status = Constants.FAIL
+      }
+
+      await this.prisma.payment.update({
+        where: {
+          id: payment.data.external_reference,
+        },
+        data: {
+          status: status
+        }
+      });
+
+      return true
+    } catch (error) {
+      console.log(error)
+      throw new HttpException('Payment could not be processed', HttpStatus.BAD_REQUEST)
+    }
   }
 }

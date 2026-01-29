@@ -30,4 +30,23 @@ export class MercadoPagoService {
     )
     return response
   }
+
+  async getPayment(id: string) {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${this.config.get('MERCADO_PAGO_TOKEN')}`,
+    }
+
+    const response = await firstValueFrom(
+      this.httpService.get(`${this.config.get('MERCADO_PAGO_URL')}/v1/payments/${id}`, {headers: headers}).pipe(
+        map((response: AxiosResponse) => {
+          return {
+            status: response.status,
+            data: response.data
+          }
+        }),
+      )
+    )
+    return response
+  }
 }

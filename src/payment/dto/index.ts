@@ -1,3 +1,4 @@
 export * from './create-payment.dto'
 export * from './update-payment.dto'
 export * from './find-payment.dto'
+export * from './notify-payment.dto'
