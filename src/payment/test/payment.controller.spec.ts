@@ -95,22 +95,6 @@ describe('PaymentController', () => {
         expect(response).toEqual({payment: paymentStub(), preference: {}});
       });
     });
-
-    describe('when createPayment is called with an invalid payment method', () => {
-      let payment: Payment | null;
-      let response: {payment: Payment, preference: any}
-      let createPayment: CreatePaymentDto;
-
-      beforeEach(async () => {
-        createPayment = {
-          cpf: '19119119100',
-          amount: 40,
-          description: '',
-          paymentMethod: 'NONE'
-        };
-        response = await paymentController.createPayment(createPayment);
-      });
-    });
   });
 
   describe('updatePayment', () => {
