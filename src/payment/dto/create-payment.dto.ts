@@ -1,6 +1,7 @@
 import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 import { IsCPF } from 'class-validator-cpf'
-import { allowedPayments } from 'src/constants'
+import { Constants } from 'src/constants'
+
 
 
 
@@ -16,7 +17,7 @@ export class CreatePaymentDto {
   amount: number
   @IsNotEmpty()
   @IsString()
-  @IsIn(allowedPayments, { message: 'Payment must be PIX or CREDIT CARD' })
+  @IsIn(Constants.ALLOWED_PAYMENTS, { message: 'Payment must be PIX or CREDIT CARD' })
   paymentMethod: string
 }
 

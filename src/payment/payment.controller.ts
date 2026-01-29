@@ -11,6 +11,11 @@ export class PaymentController {
     return this.paymentService.createPayment(dto)
   }
 
+  @Post('notify')
+  notifyPayment(@Body() dto: any){
+    return this.paymentService.notifyPayment(dto)
+  }
+
   @Patch(':id')
   updatePayment(
     @Param('id', ParseIntPipe) id: number,
