@@ -9,5 +9,5 @@ export abstract class Constants {
   static readonly MP_TYPE_PAYMENT = 'payment'
   static readonly MP_STATUS_PAID = ['approved']
   static readonly MP_STATUS_PENDING = ['pending', 'authorized', 'in_process', 'in_mediation']
-  static readonly MP_STATUS_FAIL = ['approved']
+  static readonly MP_STATUS_FAIL = ['rejected', 'cancelled', 'refunded', 'charged_back']
 }

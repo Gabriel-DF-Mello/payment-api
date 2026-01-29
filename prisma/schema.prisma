@@ -18,7 +18,7 @@ model Payment {
   id Int @id @default(autoincrement())
   cpf String
   description String?
-  amount Decimal
+  amount Decimal @db.Decimal(65, 2)
   paymentMethod String
   status String
   createdAt DateTime @default(now())

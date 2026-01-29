@@ -111,18 +111,19 @@ export class PaymentService {
 
     try {
       // Get payment via id from mercado-pago API
-      let payment = await this.mercadoPago.getPayment(dto.data.id)
-      console.log(payment)
+      const payment = await this.mercadoPago.getPayment(dto.data.id)
 
       if(!payment.data.external_reference){
         throw new NotFoundException('Payment missing external reference');
       }
 
+      const paymentId = parseInt(payment.data.external_reference, 10)
+
       // if payment status is approved, update to PAID
-      if(payment.data.status in Constants.MP_STATUS_PAID){
+      if(Constants.MP_STATUS_PAID.includes(payment.data.status)){
         status = Constants.PAID
       // if payment is pending, authorized, in_process or in_mediation, update to PENDING
-      } else if (payment.data.status in Constants.MP_STATUS_PENDING){
+      } else if (Constants.MP_STATUS_PENDING.includes(payment.data.status)){
         status = Constants.PENDING
       // if payment is rejected, cancelled, refunded or charged_back, update to FAIL
       } else {
@@ -131,7 +132,7 @@ export class PaymentService {
 
       await this.prisma.payment.update({
         where: {
-          id: payment.data.external_reference,
+          id: paymentId,
         },
         data: {
           status: status

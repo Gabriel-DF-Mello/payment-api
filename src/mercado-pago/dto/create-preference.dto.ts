@@ -43,25 +43,6 @@ export class CreatePreferenceDto {
         unit_price: amount
       }
     ]
-    this.payer = {
-      name: "John",
-      surname: "Doe",
-      email: "john@doe.com",
-      phone: {
-        area_code: "55",
-        number: 98765
-      },
-      identification: {
-        type: "CPF",
-        number: cpf
-      },
-      address: {
-        zip_code: "06233-903",
-        street_name: "Example Street",
-        street_number: 3003
-      },
-      registration_date: "2024-04-01T00:00:00Z"
-    }
     this.notification_url = `${process.env.WEBHOOK_URL}`
     this.expires = false
     this.external_reference = id.toString()
